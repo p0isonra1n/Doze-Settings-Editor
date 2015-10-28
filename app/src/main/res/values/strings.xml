@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Doze Editor</string>
+    <string name="action_save">Save</string>
+    <string name="name">Doze Setting Editor</string>
+</resources>
