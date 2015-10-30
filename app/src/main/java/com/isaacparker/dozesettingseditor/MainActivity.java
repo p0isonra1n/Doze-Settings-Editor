@@ -1,8 +1,15 @@
 package com.isaacparker.dozesettingseditor;
 
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.ClipboardManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -72,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
     EditText et_mms_temp_app_whitelist_duration;
     EditText et_sms_temp_app_whitelist_duration;
 
+    boolean hasRoot = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,63 +107,84 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (RootShell.isAccessGiven()) {
-            getSettings();
+            hasRoot = true;
+            //getSettings();
         }else{
-            Toast.makeText(this, "Root access required!", Toast.LENGTH_SHORT).show();
-            finish();
+            hasRoot = false;
+            //Toast.makeText(this, "Root access required!", Toast.LENGTH_SHORT).show();
+            //finish();
         }
+        getSettings();
     }
 
     private void getSettings() {
-        try {
-            Command command = new Command(0, "settings get global device_idle_constants") {
-                @Override
-                public void commandOutput(int id, String line) {
-                    KeyValueListParser parser = new KeyValueListParser(',');
-                    if("null".equals(line)) {
-                        parser.setString(line + "=0");
-                    }else{
-                        parser.setString(line);
+        if(hasRoot) {
+            try {
+                Command command = new Command(0, "settings get global device_idle_constants") {
+                    @Override
+                    public void commandOutput(int id, String line) {
+                        KeyValueListParser parser = new KeyValueListParser(',');
+                        if ("null".equals(line)) {
+                            parser.setString(line + "=0");
+                        } else {
+                            parser.setString(line);
+                        }
+                        et_inactive_to.setText(String.valueOf(parser.getLong(KEY_INACTIVE_TIMEOUT, INACTIVE_TIMEOUT)));
+                        et_sensing_to.setText(String.valueOf(parser.getLong(KEY_SENSING_TIMEOUT, SENSING_TIMEOUT)));
+                        et_locating_to.setText(String.valueOf(parser.getLong(KEY_LOCATING_TIMEOUT, LOCATING_TIMEOUT)));
+                        et_location_accuracy.setText(String.valueOf(parser.getFloat(KEY_LOCATION_ACCURACY, LOCATION_ACCURACY)));
+                        et_motion_inactive_to.setText(String.valueOf(parser.getLong(KEY_MOTION_INACTIVE_TIMEOUT, MOTION_INACTIVE_TIMEOUT)));
+                        et_idle_after_inactive_to.setText(String.valueOf(parser.getLong(KEY_IDLE_AFTER_INACTIVE_TIMEOUT, IDLE_AFTER_INACTIVE_TIMEOUT)));
+                        et_idle_pending_to.setText(String.valueOf(parser.getLong(KEY_IDLE_PENDING_TIMEOUT, IDLE_PENDING_TIMEOUT)));
+                        et_max_idle_pending_to.setText(String.valueOf(parser.getLong(KEY_MAX_IDLE_PENDING_TIMEOUT, MAX_IDLE_PENDING_TIMEOUT)));
+                        et_idle_pending_factor.setText(String.valueOf(parser.getFloat(KEY_IDLE_PENDING_FACTOR, IDLE_PENDING_FACTOR)));
+                        et_idle_to.setText(String.valueOf(parser.getLong(KEY_IDLE_TIMEOUT, IDLE_TIMEOUT)));
+                        et_max_idle_to.setText(String.valueOf(parser.getLong(KEY_MAX_IDLE_TIMEOUT, MAX_IDLE_TIMEOUT)));
+                        et_idle_factor.setText(String.valueOf(parser.getFloat(KEY_IDLE_FACTOR, IDLE_FACTOR)));
+                        et_min_time_to_alarm.setText(String.valueOf(parser.getLong(KEY_MIN_TIME_TO_ALARM, MIN_TIME_TO_ALARM)));
+                        et_max_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_MAX_TEMP_APP_WHITELIST_DURATION, MAX_TEMP_APP_WHITELIST_DURATION)));
+                        et_mms_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_MMS_TEMP_APP_WHITELIST_DURATION, MMS_TEMP_APP_WHITELIST_DURATION)));
+                        et_sms_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_SMS_TEMP_APP_WHITELIST_DURATION, SMS_TEMP_APP_WHITELIST_DURATION)));
+
+
+                        //MUST call the super method when overriding!
+                        super.commandOutput(id, line);
                     }
-                    et_inactive_to.setText(String.valueOf(parser.getLong(KEY_INACTIVE_TIMEOUT, INACTIVE_TIMEOUT)));
-                    et_sensing_to.setText(String.valueOf(parser.getLong(KEY_SENSING_TIMEOUT, SENSING_TIMEOUT)));
-                    et_locating_to.setText(String.valueOf(parser.getLong(KEY_LOCATING_TIMEOUT, LOCATING_TIMEOUT)));
-                    et_location_accuracy.setText(String.valueOf(parser.getFloat(KEY_LOCATION_ACCURACY, LOCATION_ACCURACY)));
-                    et_motion_inactive_to.setText(String.valueOf(parser.getLong(KEY_MOTION_INACTIVE_TIMEOUT, MOTION_INACTIVE_TIMEOUT)));
-                    et_idle_after_inactive_to.setText(String.valueOf(parser.getLong(KEY_IDLE_AFTER_INACTIVE_TIMEOUT, IDLE_AFTER_INACTIVE_TIMEOUT)));
-                    et_idle_pending_to.setText(String.valueOf(parser.getLong(KEY_IDLE_PENDING_TIMEOUT, IDLE_PENDING_TIMEOUT)));
-                    et_max_idle_pending_to.setText(String.valueOf(parser.getLong(KEY_MAX_IDLE_PENDING_TIMEOUT, MAX_IDLE_PENDING_TIMEOUT)));
-                    et_idle_pending_factor.setText(String.valueOf(parser.getFloat(KEY_IDLE_PENDING_FACTOR, IDLE_PENDING_FACTOR)));
-                    et_idle_to.setText(String.valueOf(parser.getLong(KEY_IDLE_TIMEOUT, IDLE_TIMEOUT)));
-                    et_max_idle_to.setText(String.valueOf(parser.getLong(KEY_MAX_IDLE_TIMEOUT, MAX_IDLE_TIMEOUT)));
-                    et_idle_factor.setText(String.valueOf(parser.getFloat(KEY_IDLE_FACTOR, IDLE_FACTOR)));
-                    et_min_time_to_alarm.setText(String.valueOf(parser.getLong(KEY_MIN_TIME_TO_ALARM, MIN_TIME_TO_ALARM)));
-                    et_max_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_MAX_TEMP_APP_WHITELIST_DURATION, MAX_TEMP_APP_WHITELIST_DURATION)));
-                    et_mms_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_MMS_TEMP_APP_WHITELIST_DURATION, MMS_TEMP_APP_WHITELIST_DURATION)));
-                    et_sms_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_SMS_TEMP_APP_WHITELIST_DURATION, SMS_TEMP_APP_WHITELIST_DURATION)));
 
+                    @Override
+                    public void commandTerminated(int id, String reason) {
+                    }
 
+                    @Override
+                    public void commandCompleted(int id, int exitcode) {
+                    }
 
-                    //MUST call the super method when overriding!
-                    super.commandOutput(id, line);
-                }
-
-                @Override
-                public void commandTerminated(int id, String reason) {
-                }
-
-                @Override
-                public void commandCompleted(int id, int exitcode) {
-                }
-
-            };
-            RootShell.getShell(true).add(command);
-        }catch (RootDeniedException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+                };
+                RootShell.getShell(true).add(command);
+            } catch (RootDeniedException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            et_inactive_to.setText(String.valueOf(INACTIVE_TIMEOUT));
+            et_sensing_to.setText(String.valueOf(SENSING_TIMEOUT));
+            et_locating_to.setText(String.valueOf(LOCATING_TIMEOUT));
+            et_location_accuracy.setText(String.valueOf(LOCATION_ACCURACY));
+            et_motion_inactive_to.setText(String.valueOf(MOTION_INACTIVE_TIMEOUT));
+            et_idle_after_inactive_to.setText(String.valueOf(IDLE_AFTER_INACTIVE_TIMEOUT));
+            et_idle_pending_to.setText(String.valueOf(IDLE_PENDING_TIMEOUT));
+            et_max_idle_pending_to.setText(String.valueOf(MAX_IDLE_PENDING_TIMEOUT));
+            et_idle_pending_factor.setText(String.valueOf(IDLE_PENDING_FACTOR));
+            et_idle_to.setText(String.valueOf(IDLE_TIMEOUT));
+            et_max_idle_to.setText(String.valueOf(MAX_IDLE_TIMEOUT));
+            et_idle_factor.setText(String.valueOf(IDLE_FACTOR));
+            et_min_time_to_alarm.setText(String.valueOf(MIN_TIME_TO_ALARM));
+            et_max_temp_app_whitelist_duration.setText(String.valueOf(MAX_TEMP_APP_WHITELIST_DURATION));
+            et_mms_temp_app_whitelist_duration.setText(String.valueOf(MMS_TEMP_APP_WHITELIST_DURATION));
+            et_sms_temp_app_whitelist_duration.setText(String.valueOf(SMS_TEMP_APP_WHITELIST_DURATION));
         }
     }
 
@@ -177,31 +207,53 @@ public class MainActivity extends AppCompatActivity {
         sb.append(KEY_MMS_TEMP_APP_WHITELIST_DURATION + "=" + Long.valueOf(et_mms_temp_app_whitelist_duration.getText().toString()) + ",");
         sb.append(KEY_SMS_TEMP_APP_WHITELIST_DURATION + "=" + Long.valueOf(et_sms_temp_app_whitelist_duration.getText().toString()) + ",");
 
-        try {
-            Command command = new Command(0, "settings put global device_idle_constants " + sb.toString()) {
-                @Override
-                public void commandOutput(int id, String line) {
-                    //MUST call the super method when overriding!
-                    super.commandOutput(id, line);
-                }
+        if(hasRoot) {
+            try {
+                Command command = new Command(0, "settings put global device_idle_constants " + sb.toString()) {
+                    @Override
+                    public void commandOutput(int id, String line) {
+                        //MUST call the super method when overriding!
+                        super.commandOutput(id, line);
+                    }
 
-                @Override
-                public void commandTerminated(int id, String reason) {
-                }
+                    @Override
+                    public void commandTerminated(int id, String reason) {
+                    }
 
-                @Override
-                public void commandCompleted(int id, int exitcode) {
-                    Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
-                }
+                    @Override
+                    public void commandCompleted(int id, int exitcode) {
+                        Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                    }
 
-            };
-            RootShell.getShell(true).add(command);
-        } catch (RootDeniedException e) {
-            e.printStackTrace();
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+                };
+                RootShell.getShell(true).add(command);
+            } catch (RootDeniedException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            final String command = "adb shell settings put global device_idle_constants " + sb.toString();
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("ADB Command");
+            builder.setMessage(command);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //Nothing
+                }
+            });
+            builder.setNegativeButton("Copy to clipboard", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ClipboardManager manager =
+                            (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    manager.setText(command);
+                    Toast.makeText(MainActivity.this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
     }
 
