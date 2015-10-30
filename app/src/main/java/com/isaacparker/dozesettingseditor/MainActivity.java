@@ -257,6 +257,75 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void restoreDefaults(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(KEY_INACTIVE_TIMEOUT + "=" + INACTIVE_TIMEOUT + ",");
+        sb.append(KEY_SENSING_TIMEOUT + "=" + SENSING_TIMEOUT + ",");
+        sb.append(KEY_LOCATING_TIMEOUT + "=" + LOCATING_TIMEOUT + ",");
+        sb.append(KEY_LOCATION_ACCURACY + "=" + LOCATION_ACCURACY + ",");
+        sb.append(KEY_MOTION_INACTIVE_TIMEOUT + "=" + MOTION_INACTIVE_TIMEOUT + ",");
+        sb.append(KEY_IDLE_AFTER_INACTIVE_TIMEOUT + "=" + IDLE_AFTER_INACTIVE_TIMEOUT + ",");
+        sb.append(KEY_IDLE_PENDING_TIMEOUT + "=" + IDLE_PENDING_TIMEOUT + ",");
+        sb.append(KEY_MAX_IDLE_PENDING_TIMEOUT + "=" + MAX_IDLE_PENDING_TIMEOUT + ",");
+        sb.append(KEY_IDLE_PENDING_FACTOR + "=" + IDLE_PENDING_FACTOR + ",");
+        sb.append(KEY_IDLE_TIMEOUT + "=" + IDLE_TIMEOUT + ",");
+        sb.append(KEY_MAX_IDLE_TIMEOUT + "=" + MAX_IDLE_TIMEOUT + ",");
+        sb.append(KEY_IDLE_FACTOR + "=" + IDLE_FACTOR + ",");
+        sb.append(KEY_MIN_TIME_TO_ALARM + "=" + MIN_TIME_TO_ALARM + ",");
+        sb.append(KEY_MAX_TEMP_APP_WHITELIST_DURATION + "=" + MAX_TEMP_APP_WHITELIST_DURATION + ",");
+        sb.append(KEY_MMS_TEMP_APP_WHITELIST_DURATION + "=" + MMS_TEMP_APP_WHITELIST_DURATION + ",");
+        sb.append(KEY_SMS_TEMP_APP_WHITELIST_DURATION + "=" + SMS_TEMP_APP_WHITELIST_DURATION);
+
+        if(hasRoot) {
+            try {
+                Command command = new Command(0, "settings put global device_idle_constants " + sb.toString()) {
+                    @Override
+                    public void commandOutput(int id, String line) {
+                        //MUST call the super method when overriding!
+                        super.commandOutput(id, line);
+                    }
+
+                    @Override
+                    public void commandTerminated(int id, String reason) {
+                    }
+
+                    @Override
+                    public void commandCompleted(int id, int exitcode) {
+                        Toast.makeText(MainActivity.this, "Defaults restored", Toast.LENGTH_SHORT).show();
+                    }
+
+                };
+                RootShell.getShell(true).add(command);
+            } catch (RootDeniedException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            final String command = "adb shell settings put global device_idle_constants " + sb.toString();
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("ADB Command");
+            builder.setMessage(command);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //Nothing
+                }
+            });
+            builder.setNegativeButton("Copy to clipboard", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ClipboardManager manager =
+                            (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    manager.setText(command);
+                    Toast.makeText(MainActivity.this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -272,9 +341,13 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_save) {
-            save();
-            return true;
+        switch(id){
+            case R.id.action_save:
+                save();
+                break;
+            case R.id.action_restoredefault:
+                restoreDefaults();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
