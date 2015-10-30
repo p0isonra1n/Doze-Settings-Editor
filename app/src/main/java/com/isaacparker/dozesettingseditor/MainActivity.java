@@ -12,7 +12,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.stericson.RootShell.RootShell;
@@ -62,6 +64,23 @@ public class MainActivity extends AppCompatActivity {
     final long MMS_TEMP_APP_WHITELIST_DURATION = 60 * 1000L;
     final long SMS_TEMP_APP_WHITELIST_DURATION = 20 * 1000L;
 
+    private static final String DESC_INACTIVE_TIMEOUT = "This is the time, after becoming inactive, at which we start looking at the motion sensor to determine if the device is being left alone. We don't do this immediately after going inactive just because we don't want to be continually running the significant motion sensor whenever the screen is off.";
+    private static final String DESC_SENSING_TIMEOUT = "If we don't receive a callback from AnyMotion in this amount of time + locating_to, we will change from STATE_SENSING to STATE_INACTIVE, and any AnyMotion callbacks while not in STATE_SENSING will be ignored.";
+    private static final String DESC_LOCATING_TIMEOUT = "This is how long we will wait to try to get a good location fix before going in to idle mode.";
+    private static final String DESC_LOCATION_ACCURACY = "The desired maximum accuracy (in meters) we consider the location to be good enough to go on to idle. We will be trying to get an accuracy fix at least this good or until locating_to expires.";
+    private static final String DESC_MOTION_INACTIVE_TIMEOUT = "This is the time, after seeing motion, that we wait after becoming inactive from that until we start looking for motion again.";
+    private static final String DESC_IDLE_AFTER_INACTIVE_TIMEOUT = "This is the time, after the inactive timeout elapses, that we will wait looking for significant motion until we truly consider the device to be idle.";
+    private static final String DESC_IDLE_PENDING_TIMEOUT = "This is the initial time, after being idle, that we will allow ourself to be back in the IDLE_PENDING state allowing the system to run normally until we return to idle.";
+    private static final String DESC_MAX_IDLE_PENDING_TIMEOUT = "Maximum pending idle timeout (time spent running) we will be allowed to use.";
+    private static final String DESC_IDLE_PENDING_FACTOR = "Scaling factor to apply to current pending idle timeout each time we cycle through that state.";
+    private static final String DESC_IDLE_TIMEOUT = "This is the initial time that we want to sit in the idle state before waking up again to return to pending idle and allowing normal work to run.";
+    private static final String DESC_MAX_IDLE_TIMEOUT = "Maximum idle duration we will be allowed to use.";
+    private static final String DESC_IDLE_FACTOR = "Scaling factor to apply to current idle timeout each time we cycle through that state.";
+    private static final String DESC_MIN_TIME_TO_ALARM = "This is the minimum time we will allow until the next upcoming alarm for us to actually go in to idle mode.";
+    private static final String DESC_MAX_TEMP_APP_WHITELIST_DURATION = "Max amount of time to temporarily whitelist an app when it receives a high tickle.";
+    private static final String DESC_MMS_TEMP_APP_WHITELIST_DURATION = "Amount of time we would like to whitelist an app that is receiving an MMS.";
+    private static final String DESC_SMS_TEMP_APP_WHITELIST_DURATION = "Amount of time we would like to whitelist an app that is receiving an SMS.";
+
     EditText et_inactive_to;
     EditText et_sensing_to;
     EditText et_locating_to;
@@ -78,6 +97,23 @@ public class MainActivity extends AppCompatActivity {
     EditText et_max_temp_app_whitelist_duration;
     EditText et_mms_temp_app_whitelist_duration;
     EditText et_sms_temp_app_whitelist_duration;
+
+    ImageView iv_inactive_to;
+    ImageView iv_sensing_to;
+    ImageView iv_locating_to;
+    ImageView iv_location_accuracy;
+    ImageView iv_motion_inactive_to;
+    ImageView iv_idle_after_inactive_to;
+    ImageView iv_idle_pending_to;
+    ImageView iv_max_idle_pending_to;
+    ImageView iv_idle_pending_factor;
+    ImageView iv_idle_to;
+    ImageView iv_max_idle_to;
+    ImageView iv_idle_factor;
+    ImageView iv_min_time_to_alarm;
+    ImageView iv_max_temp_app_whitelist_duration;
+    ImageView iv_mms_temp_app_whitelist_duration;
+    ImageView iv_sms_temp_app_whitelist_duration;
 
     boolean hasRoot = false;
 
@@ -105,6 +141,25 @@ public class MainActivity extends AppCompatActivity {
         et_mms_temp_app_whitelist_duration = (EditText) findViewById(R.id.et_mms_temp_app_whitelist_duration);
         et_sms_temp_app_whitelist_duration = (EditText) findViewById(R.id.et_sms_temp_app_whitelist_duration);
 
+        iv_inactive_to = (ImageView) findViewById(R.id.iv_inactive_to);
+        iv_sensing_to = (ImageView) findViewById(R.id.iv_sensing_to);
+        iv_locating_to = (ImageView) findViewById(R.id.iv_locating_to);
+        iv_location_accuracy = (ImageView) findViewById(R.id.iv_location_accurary);
+        iv_motion_inactive_to = (ImageView) findViewById(R.id.iv_motion_inactive_to);
+        iv_idle_after_inactive_to = (ImageView) findViewById(R.id.iv_idle_after_inactive_to);
+        iv_idle_pending_to = (ImageView) findViewById(R.id.iv_idle_pending_to);
+        iv_max_idle_pending_to = (ImageView) findViewById(R.id.iv_max_idle_pending_to);
+        iv_idle_pending_factor = (ImageView) findViewById(R.id.iv_idle_pending_factor);
+        iv_idle_to = (ImageView) findViewById(R.id.iv_idle_to);
+        iv_max_idle_to = (ImageView) findViewById(R.id.iv_max_idle_to);
+        iv_idle_factor = (ImageView) findViewById(R.id.iv_idle_factor);
+        iv_min_time_to_alarm = (ImageView) findViewById(R.id.iv_min_time_to_alarm);
+        iv_max_temp_app_whitelist_duration = (ImageView) findViewById(R.id.iv_max_temp_app_whitelist_duration);
+        iv_mms_temp_app_whitelist_duration = (ImageView) findViewById(R.id.iv_mms_temp_app_whitelist_duration);
+        iv_sms_temp_app_whitelist_duration = (ImageView) findViewById(R.id.iv_sms_temp_app_whitelist_duration);
+
+        setInfoOnClick();
+
 
         if (RootShell.isAccessGiven()) {
             hasRoot = true;
@@ -115,6 +170,249 @@ public class MainActivity extends AppCompatActivity {
             //finish();
         }
         getSettings();
+    }
+
+    private void setInfoOnClick() {
+        iv_inactive_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_INACTIVE_TIMEOUT);
+                builder.setMessage(DESC_INACTIVE_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_sensing_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_SENSING_TIMEOUT);
+                builder.setMessage(DESC_SENSING_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_locating_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_LOCATING_TIMEOUT);
+                builder.setMessage(DESC_LOCATING_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_location_accuracy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_LOCATION_ACCURACY);
+                builder.setMessage(DESC_LOCATION_ACCURACY);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_motion_inactive_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_MOTION_INACTIVE_TIMEOUT);
+                builder.setMessage(DESC_MOTION_INACTIVE_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_idle_after_inactive_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_IDLE_AFTER_INACTIVE_TIMEOUT);
+                builder.setMessage(DESC_IDLE_AFTER_INACTIVE_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_idle_pending_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_IDLE_PENDING_TIMEOUT);
+                builder.setMessage(DESC_IDLE_PENDING_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_max_idle_pending_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_MAX_IDLE_PENDING_TIMEOUT);
+                builder.setMessage(DESC_MAX_IDLE_PENDING_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_idle_pending_factor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_IDLE_PENDING_FACTOR);
+                builder.setMessage(DESC_IDLE_PENDING_FACTOR);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_idle_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_IDLE_TIMEOUT);
+                builder.setMessage(DESC_IDLE_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_max_idle_to.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_MAX_IDLE_TIMEOUT);
+                builder.setMessage(DESC_MAX_IDLE_TIMEOUT);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_idle_factor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_IDLE_FACTOR);
+                builder.setMessage(DESC_IDLE_FACTOR);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_min_time_to_alarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_MIN_TIME_TO_ALARM);
+                builder.setMessage(DESC_MIN_TIME_TO_ALARM);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_max_temp_app_whitelist_duration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_MAX_TEMP_APP_WHITELIST_DURATION);
+                builder.setMessage(DESC_MAX_TEMP_APP_WHITELIST_DURATION);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_mms_temp_app_whitelist_duration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_MMS_TEMP_APP_WHITELIST_DURATION);
+                builder.setMessage(DESC_MMS_TEMP_APP_WHITELIST_DURATION);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
+        iv_sms_temp_app_whitelist_duration.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle(KEY_SMS_TEMP_APP_WHITELIST_DURATION);
+                builder.setMessage(DESC_SMS_TEMP_APP_WHITELIST_DURATION);
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Nothing
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }
+        });
     }
 
     private void getSettings() {
