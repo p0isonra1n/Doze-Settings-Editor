@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_INACTIVE_TIMEOUT);
-                builder.setMessage(DESC_INACTIVE_TIMEOUT);
+                builder.setMessage(DESC_INACTIVE_TIMEOUT + "\n\nDefault: " + String.valueOf(INACTIVE_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_SENSING_TIMEOUT);
-                builder.setMessage(DESC_SENSING_TIMEOUT);
+                builder.setMessage(DESC_SENSING_TIMEOUT + "\n\nDefault: " + String.valueOf(SENSING_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_LOCATING_TIMEOUT);
-                builder.setMessage(DESC_LOCATING_TIMEOUT);
+                builder.setMessage(DESC_LOCATING_TIMEOUT + "\n\nDefault: " + String.valueOf(LOCATING_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_LOCATION_ACCURACY);
-                builder.setMessage(DESC_LOCATION_ACCURACY);
+                builder.setMessage(DESC_LOCATION_ACCURACY + "\n\nDefault: " + String.valueOf(LOCATION_ACCURACY));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_MOTION_INACTIVE_TIMEOUT);
-                builder.setMessage(DESC_MOTION_INACTIVE_TIMEOUT);
+                builder.setMessage(DESC_MOTION_INACTIVE_TIMEOUT + "\n\nDefault: " + String.valueOf(MOTION_INACTIVE_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_IDLE_AFTER_INACTIVE_TIMEOUT);
-                builder.setMessage(DESC_IDLE_AFTER_INACTIVE_TIMEOUT);
+                builder.setMessage(DESC_IDLE_AFTER_INACTIVE_TIMEOUT + "\n\nDefault: " + String.valueOf(IDLE_AFTER_INACTIVE_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_IDLE_PENDING_TIMEOUT);
-                builder.setMessage(DESC_IDLE_PENDING_TIMEOUT);
+                builder.setMessage(DESC_IDLE_PENDING_TIMEOUT + "\n\nDefault: " + String.valueOf(IDLE_PENDING_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_MAX_IDLE_PENDING_TIMEOUT);
-                builder.setMessage(DESC_MAX_IDLE_PENDING_TIMEOUT);
+                builder.setMessage(DESC_MAX_IDLE_PENDING_TIMEOUT + "\n\nDefault: " + String.valueOf(MAX_IDLE_PENDING_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -298,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_IDLE_PENDING_FACTOR);
-                builder.setMessage(DESC_IDLE_PENDING_FACTOR);
+                builder.setMessage(DESC_IDLE_PENDING_FACTOR + "\n\nDefault: " + String.valueOf(IDLE_PENDING_FACTOR));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_IDLE_TIMEOUT);
-                builder.setMessage(DESC_IDLE_TIMEOUT);
+                builder.setMessage(DESC_IDLE_TIMEOUT + "\n\nDefault: " + String.valueOf(IDLE_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_MAX_IDLE_TIMEOUT);
-                builder.setMessage(DESC_MAX_IDLE_TIMEOUT);
+                builder.setMessage(DESC_MAX_IDLE_TIMEOUT + "\n\nDefault: " + String.valueOf(MAX_IDLE_TIMEOUT));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -343,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_IDLE_FACTOR);
-                builder.setMessage(DESC_IDLE_FACTOR);
+                builder.setMessage(DESC_IDLE_FACTOR + "\n\nDefault: " + String.valueOf(IDLE_FACTOR));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -358,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_MIN_TIME_TO_ALARM);
-                builder.setMessage(DESC_MIN_TIME_TO_ALARM);
+                builder.setMessage(DESC_MIN_TIME_TO_ALARM + "\n\nDefault: " + String.valueOf(MIN_TIME_TO_ALARM));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_MAX_TEMP_APP_WHITELIST_DURATION);
-                builder.setMessage(DESC_MAX_TEMP_APP_WHITELIST_DURATION);
+                builder.setMessage(DESC_MAX_TEMP_APP_WHITELIST_DURATION + "\n\nDefault: " + String.valueOf(MAX_TEMP_APP_WHITELIST_DURATION));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -388,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_MMS_TEMP_APP_WHITELIST_DURATION);
-                builder.setMessage(DESC_MMS_TEMP_APP_WHITELIST_DURATION);
+                builder.setMessage(DESC_MMS_TEMP_APP_WHITELIST_DURATION + "\n\nDefault: " + String.valueOf(MMS_TEMP_APP_WHITELIST_DURATION));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
@@ -403,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_SMS_TEMP_APP_WHITELIST_DURATION);
-                builder.setMessage(DESC_SMS_TEMP_APP_WHITELIST_DURATION);
+                builder.setMessage(DESC_SMS_TEMP_APP_WHITELIST_DURATION + "\n\nDefault: " + String.valueOf(SMS_TEMP_APP_WHITELIST_DURATION));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
