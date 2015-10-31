@@ -3,4 +3,25 @@
     <string name="action_save">Save</string>
     <string name="name">Doze Setting Editor</string>
     <string name="action_restoredefault">Restore Defaults</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+
+    <string name="pref_title_display_value_in">Display value in</string>
+    <string-array name="pref_list_display_value_in">
+        <item>Milliseconds</item>
+        <item>Seconds</item>
+    </string-array>
+    <string-array name="pref_list_display_value_in_values">
+        <item>-1</item>
+        <item>0</item>
+    </string-array>
+
+
+
 </resources>
