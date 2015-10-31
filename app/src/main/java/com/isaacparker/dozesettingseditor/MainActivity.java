@@ -622,6 +622,10 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog dialog = builder.create();
             dialog.show();
         }
+
+        //Show changes
+        Toast.makeText(MainActivity.this, "Refreshing settings", Toast.LENGTH_SHORT).show();
+        getSettings();
     }
 
     @Override
