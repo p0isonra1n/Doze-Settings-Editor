@@ -13,6 +13,7 @@
 
 
     <string name="pref_title_display_value_in">Display value in</string>
+    <string name="action_profile">Profiles</string>
     <string-array name="pref_list_display_value_in">
         <item>Milliseconds</item>
         <item>Seconds</item>

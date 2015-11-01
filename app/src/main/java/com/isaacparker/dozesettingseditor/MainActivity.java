@@ -650,6 +650,79 @@ public class MainActivity extends AppCompatActivity {
         getSettings();
     }
 
+    private void applyProfile(String settings){
+        if(hasRoot) {
+            try {
+                Command command = new Command(0, "settings put global device_idle_constants " + settings) {
+                    @Override
+                    public void commandOutput(int id, String line) {
+                        //MUST call the super method when overriding!
+                        super.commandOutput(id, line);
+                    }
+
+                    @Override
+                    public void commandTerminated(int id, String reason) {
+                    }
+
+                    @Override
+                    public void commandCompleted(int id, int exitcode) {
+                        Toast.makeText(MainActivity.this, "Defaults restored", Toast.LENGTH_SHORT).show();
+                    }
+
+                };
+                RootShell.getShell(true).add(command);
+            } catch (RootDeniedException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            final String command = "adb shell settings put global device_idle_constants " + settings;
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("ADB Command");
+            builder.setMessage(command);
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //Nothing
+                }
+            });
+            builder.setNegativeButton("Copy to clipboard", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    ClipboardManager manager =
+                            (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                    manager.setText(command);
+                    Toast.makeText(MainActivity.this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+        //Show changes
+        Toast.makeText(MainActivity.this, "Refreshing settings", Toast.LENGTH_SHORT).show();
+        KeyValueListParser parser = new KeyValueListParser(',');
+        parser.setString(settings);
+        int divideBy= getDisplayValueFix();
+        et_inactive_to.setText(String.valueOf(parser.getLong(KEY_INACTIVE_TIMEOUT, INACTIVE_TIMEOUT) / divideBy));
+        et_sensing_to.setText(String.valueOf(parser.getLong(KEY_SENSING_TIMEOUT, SENSING_TIMEOUT) / divideBy));
+        et_locating_to.setText(String.valueOf(parser.getLong(KEY_LOCATING_TIMEOUT, LOCATING_TIMEOUT) / divideBy));
+        et_location_accuracy.setText(String.valueOf(parser.getFloat(KEY_LOCATION_ACCURACY, LOCATION_ACCURACY)));
+        et_motion_inactive_to.setText(String.valueOf(parser.getLong(KEY_MOTION_INACTIVE_TIMEOUT, MOTION_INACTIVE_TIMEOUT) / divideBy));
+        et_idle_after_inactive_to.setText(String.valueOf(parser.getLong(KEY_IDLE_AFTER_INACTIVE_TIMEOUT, IDLE_AFTER_INACTIVE_TIMEOUT) / divideBy));
+        et_idle_pending_to.setText(String.valueOf(parser.getLong(KEY_IDLE_PENDING_TIMEOUT, IDLE_PENDING_TIMEOUT) / divideBy));
+        et_max_idle_pending_to.setText(String.valueOf(parser.getLong(KEY_MAX_IDLE_PENDING_TIMEOUT, MAX_IDLE_PENDING_TIMEOUT) / divideBy));
+        et_idle_pending_factor.setText(String.valueOf(parser.getFloat(KEY_IDLE_PENDING_FACTOR, IDLE_PENDING_FACTOR)));
+        et_idle_to.setText(String.valueOf(parser.getLong(KEY_IDLE_TIMEOUT, IDLE_TIMEOUT) / divideBy));
+        et_max_idle_to.setText(String.valueOf(parser.getLong(KEY_MAX_IDLE_TIMEOUT, MAX_IDLE_TIMEOUT) / divideBy));
+        et_idle_factor.setText(String.valueOf(parser.getFloat(KEY_IDLE_FACTOR, IDLE_FACTOR)));
+        et_min_time_to_alarm.setText(String.valueOf(parser.getLong(KEY_MIN_TIME_TO_ALARM, MIN_TIME_TO_ALARM) / divideBy));
+        et_max_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_MAX_TEMP_APP_WHITELIST_DURATION, MAX_TEMP_APP_WHITELIST_DURATION) / divideBy));
+        et_mms_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_MMS_TEMP_APP_WHITELIST_DURATION, MMS_TEMP_APP_WHITELIST_DURATION) / divideBy));
+        et_sms_temp_app_whitelist_duration.setText(String.valueOf(parser.getLong(KEY_SMS_TEMP_APP_WHITELIST_DURATION, SMS_TEMP_APP_WHITELIST_DURATION) / divideBy));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -666,6 +739,17 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         switch(id){
+            case R.id.action_profile:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Profiles");
+                builder.setItems(Profiles.ProfileListNames, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        applyProfile(Profiles.ProfileList[item]);
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+                break;
             case R.id.action_save:
                 save();
                 break;
