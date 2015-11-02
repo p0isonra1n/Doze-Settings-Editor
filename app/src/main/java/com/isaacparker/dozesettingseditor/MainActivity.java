@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                 int divideBy= getDisplayValueFix();
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_LOCATION_ACCURACY);
-                builder.setMessage(DESC_LOCATION_ACCURACY + "\n\nDefault: " + String.valueOf(LOCATION_ACCURACY));
+                builder.setMessage(DESC_LOCATION_ACCURACY + "\n\nDefault: " + String.valueOf(LOCATION_ACCURACY + " meters"));
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //Nothing
