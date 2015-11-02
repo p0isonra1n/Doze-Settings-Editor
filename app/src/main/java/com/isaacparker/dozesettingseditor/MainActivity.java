@@ -229,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
         iv_location_accuracy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int divideBy= getDisplayValueFix();
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_LOCATION_ACCURACY);
                 builder.setMessage(DESC_LOCATION_ACCURACY + "\n\nDefault: " + String.valueOf(LOCATION_ACCURACY + " meters"));
@@ -309,7 +308,6 @@ public class MainActivity extends AppCompatActivity {
         iv_idle_pending_factor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int divideBy= getDisplayValueFix();
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_IDLE_PENDING_FACTOR);
                 builder.setMessage(DESC_IDLE_PENDING_FACTOR + "\n\nDefault: " + String.valueOf(IDLE_PENDING_FACTOR));
@@ -357,7 +355,6 @@ public class MainActivity extends AppCompatActivity {
         iv_idle_factor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int divideBy= getDisplayValueFix();
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(KEY_IDLE_FACTOR);
                 builder.setMessage(DESC_IDLE_FACTOR + "\n\nDefault: " + String.valueOf(IDLE_FACTOR));
