@@ -18,6 +18,12 @@
         app:showAsAction="always" />
 
     <item
+        android:id="@+id/action_save_as_profile"
+        android:orderInCategory="3"
+        android:title="@string/action_save_as_profile"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_restoredefault"
         android:orderInCategory="99"
         android:title="@string/action_restoredefault"

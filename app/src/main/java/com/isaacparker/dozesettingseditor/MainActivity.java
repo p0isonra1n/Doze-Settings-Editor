@@ -9,18 +9,23 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.ClipboardManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.stericson.RootShell.RootShell;
 import com.stericson.RootShell.exceptions.RootDeniedException;
 import com.stericson.RootShell.execution.Command;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
 public class MainActivity extends AppCompatActivity {
@@ -116,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
     boolean hasRoot = false;
     SharedPreferences sharedPref;
+    Gson gson;
     int displayValueIn;
     int millisecondsInOneSecond = 1000;
     int millisecondsInOneMinute = 60 * millisecondsInOneSecond;
@@ -128,6 +134,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        gson = new Gson();
+
+        Profiles.loadDefaultProfiles();
+        Profiles.loadUserProfiles(sharedPref, gson);
 
         et_inactive_to = (EditText) findViewById(R.id.et_inactive_to);
         et_sensing_to = (EditText) findViewById(R.id.et_sensing_to);
@@ -758,18 +768,13 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch(id){
             case R.id.action_profile:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Profiles");
-                builder.setItems(Profiles.ProfileListNames, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        applyProfile(Profiles.ProfileList[item]);
-                    }
-                });
-                AlertDialog alert = builder.create();
-                alert.show();
+                displayProfiles();
                 break;
             case R.id.action_save:
                 save();
+                break;
+            case R.id.action_save_as_profile:
+                saveAsProfile();
                 break;
             case R.id.action_restoredefault:
                 restoreDefaults();
@@ -785,5 +790,103 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStop() {
+        Profiles.saveUserProfiles(sharedPref, gson);
+        super.onStop();
+    }
+
+    private void displayProfiles() {
+        final ArrayList<Profile> combinedProfileList = new ArrayList<>();
+        combinedProfileList.addAll(Profiles.defaultProfileList);
+        combinedProfileList.addAll(Profiles.profileList);
+        int profileCount = 0;
+        String[] Names = new String[combinedProfileList.size()];
+        for(Profile profile : combinedProfileList){
+            Names[profileCount] = profile.Name;
+            profileCount++;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Profiles");
+        builder.setItems(Names, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                applyProfile(combinedProfileList.get(item).Settings);
+            }
+        });
+        final AlertDialog alert = builder.create();
+        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                ListView lv = alert.getListView(); //this is a ListView with your "buds" in it
+                lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                        if((position + 1) <= Profiles.defaultProfileList.size()){
+
+                        }else {
+                            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                            dialog.setTitle("Delete profile");
+                            dialog.setMessage(combinedProfileList.get(position).Name);
+                            dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Profiles.profileList.remove(position - Profiles.defaultProfileList.size());
+                                    combinedProfileList.remove(position);
+                                    alert.hide();
+                                }
+                            });
+                            dialog.setNegativeButton("Cancel", null);
+                            dialog.create().show();
+                        }
+                        return true;
+                    }
+                });
+            }
+        });
+        alert.show();
+    }
+
+    private void saveAsProfile() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final EditText edittext = new EditText(this);
+        alert.setTitle("Profile Name");
+
+        alert.setView(edittext);
+
+        alert.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String name = edittext.getText().toString();
+                int multiplyBy = getDisplayValueFix();
+                StringBuilder sb = new StringBuilder();
+                sb.append(KEY_INACTIVE_TIMEOUT + "=" + Long.valueOf(et_inactive_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_SENSING_TIMEOUT + "=" + Long.valueOf(et_sensing_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_LOCATING_TIMEOUT + "=" + Long.valueOf(et_locating_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_LOCATION_ACCURACY + "=" + Float.valueOf(et_location_accuracy.getText().toString()) + ",");
+                sb.append(KEY_MOTION_INACTIVE_TIMEOUT + "=" + Long.valueOf(et_motion_inactive_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_IDLE_AFTER_INACTIVE_TIMEOUT + "=" + Long.valueOf(et_idle_after_inactive_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_IDLE_PENDING_TIMEOUT + "=" + Long.valueOf(et_idle_pending_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_MAX_IDLE_PENDING_TIMEOUT + "=" + Long.valueOf(et_max_idle_pending_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_IDLE_PENDING_FACTOR + "=" + Float.valueOf(et_idle_pending_factor.getText().toString()) + ",");
+                sb.append(KEY_IDLE_TIMEOUT + "=" + Long.valueOf(et_idle_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_MAX_IDLE_TIMEOUT + "=" + Long.valueOf(et_max_idle_to.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_IDLE_FACTOR + "=" + Float.valueOf(et_idle_factor.getText().toString()) + ",");
+                sb.append(KEY_MIN_TIME_TO_ALARM + "=" + Long.valueOf(et_min_time_to_alarm.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_MAX_TEMP_APP_WHITELIST_DURATION + "=" + Long.valueOf(et_max_temp_app_whitelist_duration.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_MMS_TEMP_APP_WHITELIST_DURATION + "=" + Long.valueOf(et_mms_temp_app_whitelist_duration.getText().toString()) * multiplyBy + ",");
+                sb.append(KEY_SMS_TEMP_APP_WHITELIST_DURATION + "=" + Long.valueOf(et_sms_temp_app_whitelist_duration.getText().toString()) * multiplyBy);
+                Profile profile = new Profile(name, sb.toString());
+                Profiles.profileList.add(profile);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // what ever you want to do with No option.
+            }
+        });
+
+        alert.show();
     }
 }
