@@ -426,6 +426,11 @@ public class MainActivity extends AppCompatActivity {
                 Command command = new Command(0, "settings get global device_idle_constants") {
                     @Override
                     public void commandOutput(int id, String line) {
+                        if(line.startsWith("Error")){
+                            Toast.makeText(MainActivity.this, "Can not access device settings. You are now in non root mode.", Toast.LENGTH_LONG).show();
+                            hasRoot = false;
+                            super.commandOutput(id, line);
+                        }
                         KeyValueListParser parser = new KeyValueListParser(',');
                         if ("null".equals(line)) {
                             parser.setString(line + "=0");
