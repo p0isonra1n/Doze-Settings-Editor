@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Редакор Doze Mode</string>
+    <string name="action_save">Сохранить</string>
+    <string name="name">Редакор Doze Mode</string>
+    <string name="action_restoredefault">Восстановить стандартные</string>
+    <string name="action_settings">Настройки</string>
+    <string name="title_activity_settings">Настройки</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">Главное</string>
+
+
+    <string name="pref_title_display_value_in">Отображаемое значение</string>
+    <string name="action_profile">Профили</string>
+    <string name="action_save_as_profile">Сохранить как профили</string>
+    <string-array name="pref_list_display_value_in">
+        <item>Разное</item>
+        <item>Секунды</item>
+    </string-array>
+    <string-array name="pref_list_display_value_in_values">
+        <item>-1</item>
+        <item>0</item>
+    </string-array>
+
+
+
+</resources>
