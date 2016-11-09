@@ -796,6 +796,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         Profiles.saveUserProfiles(sharedPref, gson);
+        try { // close root shell before exiting app
+            RootShell.closeAllShells();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         super.onStop();
     }
 
